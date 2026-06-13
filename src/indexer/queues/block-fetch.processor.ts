@@ -4,9 +4,6 @@ import { Job, Queue } from "bull";
 import { ConfigService } from "@nestjs/config";
 import { ethers } from "ethers";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { BlockRange, IndexerEvent } from "../interfaces/indexer.interface";
-import { ShardManagerService } from "../services/shard-manager.service";
-import { BlockCoordinatorService } from "../services/block-coordinator.service";
 
 interface BlockFetchJob {
   range: BlockRange;
@@ -30,9 +27,7 @@ export class BlockFetchProcessor {
   private readonly batchSize = 500;
 
   constructor(
-    private readonly configService: ConfigService,
-    private readonly shardManager: ShardManagerService,
-    private readonly blockCoordinator: BlockCoordinatorService,
+  
     @InjectQueue("indexer-events")
     private readonly eventQueue: Queue,
     @InjectQueue("indexer-blocks")
@@ -110,7 +105,6 @@ export class BlockFetchProcessor {
                   ? String(log.topics[0])
                   : undefined,
               data: log.data,
-              topics: log.topics,
               shardId: range.shardId,
             };
 
