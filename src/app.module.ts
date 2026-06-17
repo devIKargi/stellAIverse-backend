@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { APP_GUARD } from "@nestjs/core";
 import { ThrottlerModule } from "@nestjs/throttler";
+import { TerminusModule } from "@nestjs/terminus";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -125,6 +127,9 @@ import { SubmissionVerifierService } from "./oracle/submission-verifier.service"
         { name: 'oracle',  ttl: 60_000, limit: 10  },
       ],
     }),
+
+    EventEmitterModule.forRoot(),
+    TerminusModule,
 
     AuthModule,
     UserModule,
