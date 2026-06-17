@@ -36,6 +36,7 @@ import { Throttle } from "@nestjs/throttler";
 import { SensitiveRateLimit } from "../common/decorators/rate-limit.decorator";
 import { Roles, Role } from "../common/decorators/roles.decorator";
 import { RolesGuard } from "../common/guard/roles.guard";
+import { Public } from "../common/decorators/public.decorator";
 
 export class RequestChallengeDto {
   @ApiProperty({
@@ -78,6 +79,7 @@ export class AuthController {
     private readonly delegationService: DelegationService,
   ) {}
 
+  @Public()
   @Post("challenge")
   @ApiOperation({
     summary: "Request Authentication Challenge",
@@ -122,6 +124,7 @@ export class AuthController {
 
   // Wallet Authentication Endpoints
 
+  @Public()
   @Post("verify")
   async verifySignature(@Body() dto: VerifySignatureDto) {
     const result = await this.walletAuthService.verifySignatureAndIssueToken(
