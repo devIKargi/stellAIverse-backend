@@ -21,6 +21,7 @@ import {
   TwoFactorVerifyDto,
   RefreshTokenDto,
 } from "./dto/kyc.dto";
+import { Public } from "../common/decorators/public.decorator";
 
 @ApiTags("Enhanced Authentication & KYC")
 @Controller("api/auth")
@@ -29,6 +30,7 @@ export class EnhancedAuthController {
     private readonly enhancedAuthService: EnhancedAuthService,
   ) {}
 
+  @Public()
   @Post("register")
   @ApiOperation({
     summary: "Register a new user account",
@@ -69,6 +71,7 @@ export class EnhancedAuthController {
     );
   }
 
+  @Public()
   @Post("login")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -109,6 +112,7 @@ export class EnhancedAuthController {
     );
   }
 
+  @Public()
   @Post("refresh")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -182,6 +186,7 @@ export class EnhancedAuthController {
     return this.enhancedAuthService.verifyTwoFactorSetup(req.user.sub, body.code);
   }
 
+  @Public()
   @Post("2fa/verify")
   @ApiOperation({
     summary: "Verify 2FA for login",
