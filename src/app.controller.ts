@@ -1,4 +1,5 @@
 import { Controller, Get, UseGuards, Request } from "@nestjs/common";
+import { HealthCheck, HealthCheckService } from "@nestjs/terminus";
 import {
   ApiTags,
   ApiOperation,
@@ -9,13 +10,19 @@ import {
 import { AppService } from "./app.service";
 import { JwtAuthGuard } from "./auth/jwt.guard";
 import { RateLimit } from "./common/decorators/rate-limit.decorator";
+import { RiskManagementHealthIndicator } from "./risk-management/health/risk-management.health";
 
 @ApiTags("Health")
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private health: HealthCheckService,
+    private riskManagementHealth: RiskManagementHealthIndicator,
+  ) {}
 
   @Get("health")
+  @HealthCheck()
   @RateLimit({ level: "free", limit: 2, windowMs: 60000 }) // Max 2 requests per minute for health
   @ApiOperation({
     summary: "Health Check",
@@ -28,8 +35,10 @@ export class AppController {
     schema: {
       type: "object",
       properties: {
-        status: { type: "string", example: "OK" },
-        timestamp: { type: "string", example: "2024-02-25T05:30:00.000Z" },
+        status: { type: "string", example: "ok" },
+        info: { type: "object" },
+        error: { type: "object" },
+        details: { type: "object" },
       },
     },
   })
@@ -37,8 +46,10 @@ export class AppController {
     status: 429,
     description: "Too many requests",
   })
-  getHealth(): { status: string; timestamp: string } {
-    return this.appService.getHealth();
+  checkHealth() {
+    return this.health.check([
+      () => this.riskManagementHealth.isHealthy(),
+    ]);
   }
 
   @Get("info")

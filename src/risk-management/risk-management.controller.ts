@@ -47,14 +47,23 @@ export class RiskManagementController {
   /** GET /api/risk/circuit-breaker - Get circuit breaker status */
   @Get("circuit-breaker")
   getCircuitBreaker() {
-    return this.circuitBreaker.getStatus();
+    const allStatus = this.circuitBreaker.getAllStatus();
+    return {
+      services: Array.from(allStatus.entries()).map(([serviceName, data]) => ({
+        serviceName,
+        ...data,
+      })),
+    };
   }
 
-  /** POST /api/risk/circuit-breaker/reset - Reset circuit breaker */
+  /** POST /api/risk/circuit-breaker/reset - Reset circuit breaker for a service */
   @Post("circuit-breaker/reset")
-  resetCircuitBreaker() {
-    this.circuitBreaker.reset();
-    return { success: true };
+  resetCircuitBreaker(@Body() body: { serviceName?: string }) {
+    if (body.serviceName) {
+      this.circuitBreaker.reset(body.serviceName);
+      return { success: true, message: `Circuit breaker reset for ${body.serviceName}` };
+    }
+    return { success: false, message: "serviceName is required" };
   }
 
   @Post("portfolio/:userId/analyze")
